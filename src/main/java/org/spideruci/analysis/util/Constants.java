@@ -1,4 +1,4 @@
-package org.spideruci.analysis.util.caryatid;
+package org.spideruci.analysis.util;
 
 public class Constants {
 

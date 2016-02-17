@@ -11,6 +11,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map.Entry;
+
+import org.objectweb.asm.Opcodes;
+
 import java.util.Random;
 import java.util.Stack;
 
@@ -18,7 +21,13 @@ import java.util.Stack;
 public class Helper {
 
   public static int s2i(final String str) {
-    return Integer.parseInt(str);
+    try {
+      return Integer.parseInt(str);
+    } catch(NumberFormatException ex) {
+      System.out.println("Invalid number:" + str);
+      throw ex;
+    }
+    
   }
 
   public static String i2s(final int i) {
@@ -53,15 +62,30 @@ public class Helper {
 
   public static int getArgCount(String methodName, boolean isStatic) {
     final String desc = extractDescFromMethodIdent(methodName);
-    return argInitialsFromDesc(desc, isStatic).length;
+    return argInitialsFromDescInternal(desc, isStatic).length;
   }
 
   public static char[] getArgInitials(String methodName, boolean isStatic) {
     final String desc = extractDescFromMethodIdent(methodName);
-    return argInitialsFromDesc(desc, isStatic);
+    return argInitialsFromDescInternal(desc, isStatic);
+  }
+  
+  public static String[] getArgTypes(String methodName, String methodOwner, boolean isStatic) {
+    final String[] temp = Helper.getArgTypeSplit(methodName);
+    if(isStatic) {
+      return temp;
+    }
+    else {
+      final String[] argTypes = new String[temp.length + 1];
+      argTypes[0] = "L" + methodOwner + ";";
+      for(int i = 0; i < temp.length; i += 1) {
+        argTypes[i+1] = temp[i];
+      }
+      return argTypes;
+    }
   }
 
-  private static char[] argInitialsFromDesc(String desc, boolean isStatic) {
+  private static char[] argInitialsFromDescInternal(String desc, boolean isStatic) {
     String x1 = desc.replace("[", "");
     String x2 = x1.replace(";", "; ");
     String x3 = x2.replaceAll("L\\S+;", "L");
@@ -84,7 +108,7 @@ public class Helper {
       desc = extractDescFromMethodIdent(desc);
     }
     
-    int argCount = argInitialsFromDesc(desc, true).length;
+    int argCount = argInitialsFromDescInternal(desc, true).length;
     String[] argTypeSplit = new String[argCount];
 
     int count = 0;
@@ -122,10 +146,19 @@ public class Helper {
   }
 
   public static boolean isArgPrimitive(char argInitial) {
-    if(Character.toUpperCase(argInitial) == 'L') {
+    switch(argInitial) {
+    case 'B': case 'b':
+    case 'C': case 'c':
+    case 'D': case 'd':
+    case 'F': case 'f':
+    case 'I': case 'i':
+    case 'J': case 'j':
+    case 'S': case 's':
+    case 'Z': case 'z':
+      return true;
+    default:
       return false;
     }
-    return true;
   }
 
   public static void grep(String exact, File file, File output) {

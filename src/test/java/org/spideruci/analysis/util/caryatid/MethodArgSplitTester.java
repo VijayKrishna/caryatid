@@ -225,4 +225,34 @@ public class MethodArgSplitTester {
     // then
     assertArrayEquals(new String[] {"Z", "Z", "Ljava/lang/String;", "B", "B", "B"}, argSplit);
   }
+  
+  @Test
+  public void testZipFile$access$1400() {
+    //given
+    final String desc = "(JJJ[BII)I";
+    //when
+    final String[] argSplit = Helper.getArgTypeSplit(desc);
+    //then
+    assertArrayEquals(new String[] {"J", "J", "J", "[B", "I", "I"}, argSplit);
+  }
+  
+  @Test
+  public void test$fop$pdf4PDFDocument$makePattern() {
+    //given
+    final String desc = "(I"
+        + "Lorg/apache/fop/pdf/PDFResources;"
+        + "II"
+        + "Ljava/util/List;"
+        + "DD"
+        + "Ljava/util/List;"
+        + "Ljava/util/List;"
+        + "Ljava/lang/StringBuffer;)Lorg/apache/fop/pdf/PDFPattern;";
+    //when
+    final String[] argSplit = Helper.getArgTypeSplit(desc);
+    //then
+    assertArrayEquals(new String[] {"I", "Lorg/apache/fop/pdf/PDFResources;", 
+        "I", "I", "Ljava/util/List;", "D", "D",
+        "Ljava/util/List;", "Ljava/util/List;", 
+        "Ljava/lang/StringBuffer;"}, argSplit);
+  }
 }
